@@ -1,5 +1,10 @@
 class ArticlesController < ApplicationController
   def index
-    @articles = Article.all
+    render json: articles
+  end
+  private
+
+  def articles
+    Article.all
   end
 end
