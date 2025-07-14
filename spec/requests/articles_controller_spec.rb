@@ -55,5 +55,34 @@ RSpec.describe ArticlesController, type: :request do
 
       expect(json_response['articles']).to eq(articles)
     end
+
+    context 'with pagination' do
+      before do
+        Article.destroy_all
+
+        10.times do |i|
+          Article.create(
+            title: "Article #{i}",
+            body: "Body #{i}",
+            status: "published"
+          )
+        end
+        get articles_path, params: { page: 3, per_page: 4 }
+      end
+
+      it 'returns the correct page' do
+        json_response = JSON.parse(response.body)
+        expect(json_response['articles'].length).to eq(2)
+      end
+
+      it 'returns correct pagination metadata' do
+        json_response = JSON.parse(response.body)
+        expect(json_response['meta']).to eq(
+          'current_page' => 3,
+          'total_pages' => 3,
+          'total_articles' => 10
+        )
+      end
+    end
   end
 end
