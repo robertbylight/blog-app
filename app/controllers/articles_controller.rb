@@ -1,6 +1,9 @@
 class ArticlesController < ApplicationController
   def index
-    render json: articles
+    render json: {
+      articles: articles,
+      meta: pagination_meta(articles)
+    }
   end
 
   private
@@ -15,5 +18,13 @@ class ArticlesController < ApplicationController
     else
       Article.all
     end
+  end
+
+  def pagination_meta(articles)
+    {
+      current_page: articles.current_page,
+      total_pages: articles.total_pages,
+      total_articles: articles.total_entries
+    }
   end
 end
