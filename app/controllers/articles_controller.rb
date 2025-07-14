@@ -21,6 +21,8 @@ class ArticlesController < ApplicationController
   end
 
   def pagination_meta(articles)
+    return {} unless articles.respond_to?(:current_page)
+
     {
       current_page: articles.current_page,
       total_pages: articles.total_pages,
