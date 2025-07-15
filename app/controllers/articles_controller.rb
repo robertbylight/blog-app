@@ -1,5 +1,6 @@
 class ArticlesController < ApplicationController
   include HappySorting
+  include AnxiousFiltering
 
   def index
     render json: {
@@ -13,6 +14,7 @@ class ArticlesController < ApplicationController
   def articles
     article_list = Article.all
     article_list = sort_articles(article_list)
+    article_list = filter_articles(article_list, params[:filter_by]) if params[:filter_by].present?
 
     is_using_pagination = params[:page].present? || params[:per_page].present?
 
