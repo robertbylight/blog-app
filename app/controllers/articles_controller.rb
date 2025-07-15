@@ -5,7 +5,7 @@ class ArticlesController < ApplicationController
   def index
     render json: {
       articles: articles,
-      meta: pagination_meta(articles)
+      meta: meta(articles)
     }
   end
 
@@ -27,13 +27,31 @@ class ArticlesController < ApplicationController
     end
   end
 
-  def pagination_meta(articles)
-    return {} unless articles.respond_to?(:current_page)
+  def meta(articles)
+    meta = {}
 
-    {
-      current_page: articles.current_page,
-      total_pages: articles.total_pages,
-      total_articles: articles.total_entries
-    }
+    if articles.respond_to?(:current_page)
+      meta.merge!({
+        current_page: articles.current_page,
+        total_pages: articles.total_pages,
+        total_articles: articles.total_entries
+      })
+    end
+
+    if params[:sort_by].present? && params[:sort_order].present?
+      meta[:sort] = {
+        field: params[:sort_by],
+        order: params[:sort_order]
+      }
+    end
+
+    if params[:filter_by].present?
+      meta[:filter] = {
+        field: params[:filter_by],
+        value: params[params[:filter_by]]
+      }
+    end
+
+    meta
   end
 end
