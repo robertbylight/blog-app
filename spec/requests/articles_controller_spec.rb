@@ -136,5 +136,23 @@ RSpec.describe ArticlesController, type: :request do
         end
       end
     end
+
+    context 'filtering' do
+      before do
+        Article.destroy_all
+        Article.create(title: 'Bilbo', body: 'Why shouldnt I keep it?', status: 'published')
+        Article.create(title: 'Gandolf', body: 'keep it safe', status: 'published')
+        Article.create(title: 'Frodo', body: 'Gandolf!!', status: 'draft')
+        Article.create(title: 'Aragorn', body: 'You have my sword', status: 'published')
+      end
+
+      it 'filters articles by status' do
+        get articles_path, params: { filter_by: 'status', status: 'published' }
+
+        json_response = JSON.parse(response.body)
+        expect(json_response['articles'].length).to eq(3)
+        expect(json_response['articles'].map { |article| article['status'] }).to all(eq('published'))
+      end
+    end
   end
 end
