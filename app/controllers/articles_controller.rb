@@ -1,12 +1,22 @@
 class ArticlesController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   include HappySorting
   include AnxiousFiltering
+  include ErrorHandling
 
   def index
     render json: {
       articles: articles,
       meta: meta(articles)
     }
+  end
+
+  def create
+    article = Article.create!(article_attributes)
+    render json: article, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
   private
@@ -25,6 +35,10 @@ class ArticlesController < ApplicationController
     else
       article_list
     end
+  end
+
+  def article_attributes
+    params.require(:article).permit(:title, :body, :status)
   end
 
   def meta(articles)
