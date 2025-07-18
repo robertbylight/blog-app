@@ -4,6 +4,11 @@ module HappySorting
   def sort_articles(articles)
     return articles unless params[:sort_by].present?
 
+    unless [ "title", "created_at" ].include?(params[:sort_by])
+      raise ErrorHandling::InvalidSortError,
+      "Invalid sort param '#{params[:sort_by]}': allowed fields are 'title', 'created_at'"
+    end
+
     case params[:sort_by]
     when "title"
       articles.order(title: sort_order)
