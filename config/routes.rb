@@ -1,9 +1,7 @@
 Rails.application.routes.draw do
   root "articles#index"
 
-  get "/articles", to: "articles#index"
-
-  get "up" => "rails/health#show", as: :rails_health_check
+  resources :articles, only: %i[index create]
 
   # Render dynamic PWA files from app/views/pwa/*
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
