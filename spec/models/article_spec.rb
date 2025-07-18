@@ -1,34 +1,41 @@
 require 'rails_helper'
 
 RSpec.describe Article, type: :model do
-  shared_examples 'article validation error' do |field, message|
-    it "validates #{field}" do
-      expect(article.valid?).to be false
-      expect(article.errors[field]).to include(message)
-    end
-  end
-
-  shared_examples 'valid article' do
-    it 'valid article' do
-      expect(article.valid?).to be true
-    end
-  end
-
   describe 'validations' do
-    context 'title validations' do
-      context 'no title' do
-        let(:article) { Article.new(status: 'draft') }
-        include_examples 'article validation error', :title, "must be present"
+    let(:article) { Article.create(title: 'First', body: 'body 1', status: 'published') }
+    shared_examples 'article validation error' do |field, message|
+      it "validates #{field}" do
+        article.valid?
+        expect(article.errors[field]).to include(message)
       end
+    end
 
-      context 'article has less than 3 characters' do
-        let(:article) { Article.new(title: 'bo', status: 'draft') }
-        include_examples 'article validation error', :title, "must be at least 3 characters"
+    shared_examples 'valid article' do
+      it 'valid article' do
+        expect(article.valid?).to be true
       end
+    end
+    context 'when validating title' do
+      context 'and title is invalid' do
+        it "validates presence of title" do
+          article = Article.new(status: 'draft')
 
-      context 'article has more than 100 characters' do
-        let(:article) { Article.new(title: 'robert' * 50, status: 'draft') }
-        include_examples 'article validation error', :title, "cannot be longer than 100 characters"
+          article.valid?
+          expect(article.errors[:title]).to include("must be present")
+        end
+        it 'has less than 3 characters' do
+          article = Article.new(title: 'bo', status: 'draft')
+          article.valid?
+          expect(article.errors[:title]).to include("must be at least 3 characters")
+        end
+        it 'has more than 100 characters' do
+          article = Article.new(title: 'robert' * 50, status: 'draft')
+          article.valid?
+          expect(article.errors[:title]).to include("cannot be longer than 100 characters")
+        end
+      end
+      context 'when validating title and title is valid' do
+        it_behaves_like 'valid article'
       end
     end
 

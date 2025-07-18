@@ -17,12 +17,12 @@ RSpec.describe ArticlesController, type: :request do
 
       get articles_path
     end
-    context 'when article requests are successfull' do
+    context 'when a valid request is made' do
       include_examples 'successful response'
 
       it 'returns articles and meta keys in response' do
         json_response = JSON.parse(response.body)
-
+        expect(json_response["articles"][0]["body"]).to eq("body 1")
         expect(json_response).to include('articles', 'meta')
       end
 
